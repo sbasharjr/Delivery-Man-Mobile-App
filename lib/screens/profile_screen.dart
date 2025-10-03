@@ -39,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    user?.name ?? 'Delivery Partner',
+                    user?.storeName ?? user?.name ?? 'Vendor Store',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -57,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Text(
-                      'Delivery Man',
+                      'Vendor',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.white,
@@ -82,27 +82,27 @@ class ProfileScreen extends StatelessWidget {
                     label: 'Phone',
                     value: user?.phone ?? 'N/A',
                   ),
-                  if (user?.vehicleType != null) ...[
+                  if (user?.storeAddress != null) ...[
                     const SizedBox(height: 12),
                     _buildInfoCard(
-                      icon: Icons.directions_car,
-                      label: 'Vehicle Type',
-                      value: user!.vehicleType!,
+                      icon: Icons.location_on,
+                      label: 'Store Address',
+                      value: user!.storeAddress!,
                     ),
                   ],
-                  if (user?.vehicleNumber != null) ...[
+                  if (user?.storeDescription != null) ...[
                     const SizedBox(height: 12),
                     _buildInfoCard(
-                      icon: Icons.pin,
-                      label: 'Vehicle Number',
-                      value: user!.vehicleNumber!,
+                      icon: Icons.description,
+                      label: 'Store Description',
+                      value: user!.storeDescription!,
                     ),
                   ],
                   const SizedBox(height: 24),
                   _buildMenuTile(
                     context,
                     icon: Icons.edit,
-                    title: 'Edit Profile',
+                    title: 'Edit Store Profile',
                     onTap: () {
                       // Navigate to edit profile screen
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,12 +115,12 @@ class ProfileScreen extends StatelessWidget {
                   _buildMenuTile(
                     context,
                     icon: Icons.history,
-                    title: 'Delivery History',
+                    title: 'Sales History',
                     onTap: () {
-                      // Navigate to delivery history
+                      // Navigate to sales history
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Delivery history feature coming soon'),
+                          content: Text('Sales history feature coming soon'),
                         ),
                       );
                     },
@@ -235,12 +235,12 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('About MyGetWell Delivery'),
+        title: const Text('About MyGetWell Vendor'),
         content: const Text(
-          'MyGetWell Delivery Man App\n\n'
+          'MyGetWell Vendor App\n\n'
           'Version 1.0.0\n\n'
-          'This app helps delivery partners manage and complete '
-          'deliveries efficiently for MyGetWell platform.',
+          'This app helps vendors manage their store, products, and orders '
+          'efficiently for MyGetWell platform.',
         ),
         actions: [
           TextButton(

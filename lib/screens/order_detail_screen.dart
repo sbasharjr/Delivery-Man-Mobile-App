@@ -62,23 +62,27 @@ class OrderDetailScreen extends StatelessWidget {
     switch (order.status) {
       case 'pending':
         statusColor = Colors.orange;
-        statusText = 'Pending Assignment';
+        statusText = 'New Order';
         break;
-      case 'assigned':
+      case 'accepted':
         statusColor = Colors.blue;
-        statusText = 'Assigned';
+        statusText = 'Order Accepted';
         break;
-      case 'picked_up':
+      case 'preparing':
         statusColor = Colors.purple;
-        statusText = 'Picked Up';
+        statusText = 'Preparing';
         break;
-      case 'in_transit':
+      case 'ready':
         statusColor = Colors.indigo;
-        statusText = 'In Transit';
+        statusText = 'Ready for Pickup/Delivery';
         break;
-      case 'delivered':
+      case 'completed':
         statusColor = Colors.green;
-        statusText = 'Delivered';
+        statusText = 'Completed';
+        break;
+      case 'cancelled':
+        statusColor = Colors.red;
+        statusText = 'Cancelled';
         break;
       default:
         statusColor = Colors.grey;
@@ -229,24 +233,66 @@ class OrderDetailScreen extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            const Text(
-              'Total Amount',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Total Amount',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '\$${order.totalAmount.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '\$${order.totalAmount.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primaryColor,
+            if (order.paymentMethod != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Payment Method',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  Text(
+                    order.paymentMethod!.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
+            if (order.deliveryType != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Delivery Type',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  Text(
+                    order.deliveryType!.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -283,25 +329,62 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, Order order) {
-    if (order.status == 'delivered' || order.status == 'cancelled') {
+    if (order.status == 'completed' || order.status == 'cancelled') {
       return const SizedBox.shrink();
     }
 
-    String nextStatus;
-    String buttonText;
+    List<Widget> buttons = [];
 
     switch (order.status) {
-      case 'assigned':
-        nextStatus = 'picked_up';
-        buttonText = 'Mark as Picked Up';
+      case 'pending':
+        buttons = [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              onPressed: () => _updateOrderStatus(context, order.id, 'accepted'),
+              child: const Text('Accept Order'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () => _updateOrderStatus(context, order.id, 'cancelled'),
+              child: const Text('Decline'),
+            ),
+          ),
+        ];
         break;
-      case 'picked_up':
-        nextStatus = 'in_transit';
-        buttonText = 'Start Delivery';
+      case 'accepted':
+        buttons = [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _updateOrderStatus(context, order.id, 'preparing'),
+              child: const Text('Start Preparing'),
+            ),
+          ),
+        ];
         break;
-      case 'in_transit':
-        nextStatus = 'delivered';
-        buttonText = 'Mark as Delivered';
+      case 'preparing':
+        buttons = [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _updateOrderStatus(context, order.id, 'ready'),
+              child: const Text('Mark as Ready'),
+            ),
+          ),
+        ];
+        break;
+      case 'ready':
+        buttons = [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              onPressed: () => _updateOrderStatus(context, order.id, 'completed'),
+              child: const Text('Mark as Completed'),
+            ),
+          ),
+        ];
         break;
       default:
         return const SizedBox.shrink();
@@ -319,9 +402,8 @@ class OrderDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: ElevatedButton(
-        onPressed: () => _updateOrderStatus(context, order.id, nextStatus),
-        child: Text(buttonText),
+      child: Row(
+        children: buttons,
       ),
     );
   }

@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.local_shipping_outlined,
+                Icons.store_outlined,
                 size: 100,
                 color: Colors.white,
               ),
@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Delivery Partner',
+                'Vendor App',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white70,

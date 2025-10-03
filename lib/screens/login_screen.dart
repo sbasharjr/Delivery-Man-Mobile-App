@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 60),
                 Icon(
-                  Icons.local_shipping_outlined,
+                  Icons.store_outlined,
                   size: 80,
                   color: Theme.of(context).primaryColor,
                 ),
