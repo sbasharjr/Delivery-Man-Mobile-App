@@ -14,13 +14,16 @@ class OrderProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   List<Order> get pendingOrders =>
-      _orders.where((order) => order.status == 'pending' || order.status == 'assigned').toList();
+      _orders.where((order) => order.status == 'pending').toList();
 
   List<Order> get activeOrders =>
-      _orders.where((order) => order.status == 'picked_up' || order.status == 'in_transit').toList();
+      _orders.where((order) => order.status == 'accepted' || order.status == 'preparing').toList();
+
+  List<Order> get readyOrders =>
+      _orders.where((order) => order.status == 'ready').toList();
 
   List<Order> get completedOrders =>
-      _orders.where((order) => order.status == 'delivered').toList();
+      _orders.where((order) => order.status == 'completed').toList();
 
   final ApiService _apiService = ApiService();
 

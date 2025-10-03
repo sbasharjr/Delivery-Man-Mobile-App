@@ -6,8 +6,10 @@ import 'screens/home_screen.dart';
 import 'screens/orders_screen.dart';
 import 'screens/order_detail_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/products_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
+import 'providers/product_provider.dart';
 import 'utils/app_theme.dart';
 
 void main() {
@@ -23,9 +25,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
-        title: 'MyGetWell Delivery',
+        title: 'MyGetWell Vendor',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         initialRoute: '/',
@@ -36,6 +39,7 @@ class MyApp extends StatelessWidget {
           '/orders': (context) => const OrdersScreen(),
           '/order-detail': (context) => const OrderDetailScreen(),
           '/profile': (context) => const ProfileScreen(),
+          '/products': (context) => const ProductsScreen(),
         },
       ),
     );

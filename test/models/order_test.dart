@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:delivery_man_app/models/order.dart';
+import 'package:vendor_app/models/order.dart';
 
 void main() {
   group('Order Model Tests', () {
@@ -13,6 +13,8 @@ void main() {
         'order_date': '2024-01-15',
         'total_amount': 50.99,
         'status': 'pending',
+        'payment_method': 'cash',
+        'delivery_type': 'delivery',
         'items': [
           {
             'name': 'Product 1',
@@ -32,6 +34,8 @@ void main() {
       expect(order.deliveryAddress, '123 Main St, City');
       expect(order.totalAmount, 50.99);
       expect(order.status, 'pending');
+      expect(order.paymentMethod, 'cash');
+      expect(order.deliveryType, 'delivery');
       expect(order.items.length, 1);
       expect(order.items[0].name, 'Product 1');
     });
@@ -46,6 +50,8 @@ void main() {
         orderDate: '2024-01-15',
         totalAmount: 50.99,
         status: 'pending',
+        paymentMethod: 'cash',
+        deliveryType: 'delivery',
         items: [
           OrderItem(
             name: 'Product 1',
@@ -62,6 +68,8 @@ void main() {
       expect(json['id'], 'ORD123');
       expect(json['customer_name'], 'John Doe');
       expect(json['total_amount'], 50.99);
+      expect(json['payment_method'], 'cash');
+      expect(json['delivery_type'], 'delivery');
       expect(json['items'], isA<List>());
       expect(json['items'].length, 1);
     });
@@ -86,6 +94,8 @@ void main() {
       expect(order.latitude, isNull);
       expect(order.longitude, isNull);
       expect(order.specialInstructions, isNull);
+      expect(order.paymentMethod, isNull);
+      expect(order.deliveryType, isNull);
     });
   });
 

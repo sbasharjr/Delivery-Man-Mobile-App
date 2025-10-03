@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/order_provider.dart';
+import '../providers/product_provider.dart';
 import '../widgets/order_summary_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,12 +18,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadOrders();
+    _loadData();
   }
 
-  Future<void> _loadOrders() async {
+  Future<void> _loadData() async {
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-    await orderProvider.fetchOrders();
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    await Future.wait([
+      orderProvider.fetchOrders(),
+      productProvider.fetchProducts(),
+    ]);
   }
 
   void _onItemTapped(int index) {
@@ -38,6 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.of(context).pushNamed('/orders');
         break;
       case 2:
+        Navigator.of(context).pushNamed('/products');
+        break;
+      case 3:
         Navigator.of(context).pushNamed('/profile');
         break;
     }
@@ -47,19 +55,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final orderProvider = Provider.of<OrderProvider>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('Vendor Dashboard'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadOrders,
+            onPressed: _loadData,
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _loadOrders,
+        onRefresh: _loadData,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
@@ -75,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 30,
                         backgroundColor: Theme.of(context).primaryColor,
                         child: Text(
-                          authProvider.currentUser?.name[0].toUpperCase() ?? 'D',
+                          authProvider.currentUser?.name[0].toUpperCase() ?? 'V',
                           style: const TextStyle(
                             fontSize: 24,
                             color: Colors.white,
@@ -89,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              authProvider.currentUser?.name ?? 'Delivery Partner',
+                              authProvider.currentUser?.storeName ?? 
+                              authProvider.currentUser?.name ?? 
+                              'Vendor Store',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -138,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Order Statistics',
+                'Statistics',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -161,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       'Active',
                       orderProvider.activeOrders.length.toString(),
-                      Icons.local_shipping,
+                      Icons.restaurant_menu,
                       Colors.blue,
                     ),
                   ),
@@ -173,20 +184,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: _buildStatCard(
                       context,
-                      'Completed',
-                      orderProvider.completedOrders.length.toString(),
-                      Icons.check_circle,
-                      Colors.green,
+                      'Ready',
+                      orderProvider.readyOrders.length.toString(),
+                      Icons.shopping_bag,
+                      Colors.purple,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
                       context,
-                      'Total',
-                      orderProvider.orders.length.toString(),
-                      Icons.assignment,
-                      Colors.purple,
+                      'Products',
+                      productProvider.products.length.toString(),
+                      Icons.inventory_2,
+                      Colors.green,
                     ),
                   ),
                 ],
@@ -196,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Active Orders',
+                    'Pending Orders',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -212,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 16),
               if (orderProvider.isLoading)
                 const Center(child: CircularProgressIndicator())
-              else if (orderProvider.activeOrders.isEmpty)
+              else if (orderProvider.pendingOrders.isEmpty)
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32),
@@ -225,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No active orders',
+                          'No pending orders',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -239,12 +250,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: orderProvider.activeOrders.length > 3
+                  itemCount: orderProvider.pendingOrders.length > 3
                       ? 3
-                      : orderProvider.activeOrders.length,
+                      : orderProvider.pendingOrders.length,
                   itemBuilder: (context, index) {
                     return OrderSummaryCard(
-                      order: orderProvider.activeOrders[index],
+                      order: orderProvider.pendingOrders[index],
                     );
                   },
                 ),
@@ -253,6 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
@@ -263,6 +275,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
             label: 'Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2),
+            label: 'Products',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

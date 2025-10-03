@@ -1,4 +1,4 @@
-# MyGetWell Delivery Man App - Architecture Overview
+# MyGetWell Vendor App - Architecture Overview
 
 ## Application Architecture
 
@@ -11,20 +11,20 @@ This Flutter application follows a clean architecture pattern with clear separat
 │  │  Splash  │  │  Login   │  │   Home   │  │  Orders  │   │
 │  │  Screen  │  │  Screen  │  │  Screen  │  │  Screen  │   │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│  ┌──────────┐  ┌──────────┐                                 │
-│  │  Order   │  │ Profile  │                                 │
-│  │  Detail  │  │  Screen  │                                 │
-│  └──────────┘  └──────────┘                                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                 │
+│  │  Order   │  │ Profile  │  │ Products │                 │
+│  │  Detail  │  │  Screen  │  │  Screen  │                 │
+│  └──────────┘  └──────────┘  └──────────┘                 │
 └─────────────────────────────────────────────────────────────┘
                            ↕
 ┌─────────────────────────────────────────────────────────────┐
 │                    State Management (Provider)               │
-│  ┌─────────────────┐         ┌─────────────────┐           │
-│  │  Auth Provider  │         │  Order Provider │           │
-│  │  - Login        │         │  - Fetch Orders │           │
-│  │  - Logout       │         │  - Update Status│           │
-│  │  - User State   │         │  - Order State  │           │
-│  └─────────────────┘         └─────────────────┘           │
+│  ┌─────────────────┐  ┌─────────────────┐ ┌─────────────┐ │
+│  │  Auth Provider  │  │  Order Provider │ │Product Prov │ │
+│  │  - Login        │  │  - Fetch Orders │ │- Fetch Prods│ │
+│  │  - Logout       │  │  - Update Status│ │- Add Product│ │
+│  │  - User State   │  │  - Order State  │ │- Update/Del │ │
+│  └─────────────────┘  └─────────────────┘ └─────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                            ↕
 ┌─────────────────────────────────────────────────────────────┐
@@ -38,11 +38,11 @@ This Flutter application follows a clean architecture pattern with clear separat
                            ↕
 ┌─────────────────────────────────────────────────────────────┐
 │                          Data Layer                          │
-│  ┌──────────────┐           ┌──────────────────┐           │
-│  │ Order Model  │           │    User Model    │           │
-│  │ - Order      │           │    - User        │           │
-│  │ - OrderItem  │           │                  │           │
-│  └──────────────┘           └──────────────────┘           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐ │
+│  │ Order Model  │  │  User Model  │  │  Product Model   │ │
+│  │ - Order      │  │  - User      │  │  - Product       │ │
+│  │ - OrderItem  │  │              │  │                  │ │
+│  └──────────────┘  └──────────────┘  └──────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -58,19 +58,19 @@ Splash Screen (Auto-navigate)
                                 ↓
                             Home Screen
                                 ↓
-                    ┌───────────┼───────────┐
-                    ↓           ↓           ↓
-            Orders Screen   Home Screen   Profile Screen
-                ↓
-        Order Detail Screen
-            ↓
-    [Update Status: Picked Up → In Transit → Delivered]
+                ┌───────────────┼───────────────┬───────────┐
+                ↓               ↓               ↓           ↓
+        Orders Screen   Products Screen   Home Screen   Profile Screen
+            ↓               ↓
+    Order Detail Screen  [Add/Edit Product Dialog]
+        ↓
+    [Update Status: Accept → Preparing → Ready → Completed]
 ```
 
 ## Key Features by Screen
 
 ### 1. Splash Screen (`splash_screen.dart`)
-- Animated logo display
+- Animated vendor logo display
 - Auto-authentication check
 - Route to appropriate screen
 
@@ -81,14 +81,16 @@ Splash Screen (Auto-navigate)
 - Loading states
 
 ### 3. Home Screen (`home_screen.dart`)
-- Order statistics dashboard
-- Active order summary cards
+- Vendor dashboard with statistics
+- Order statistics (Pending, Active, Ready)
+- Product count
+- Pending orders preview
 - Quick navigation
 - Pull-to-refresh
-- Bottom navigation bar
+- Bottom navigation bar (4 tabs)
 
 ### 4. Orders Screen (`orders_screen.dart`)
-- Tabbed interface (Pending, Active, Completed)
+- Tabbed interface (Pending, Active, Ready, Completed)
 - Filtered order lists
 - Pull-to-refresh
 - Tap to view details
@@ -96,12 +98,22 @@ Splash Screen (Auto-navigate)
 ### 5. Order Detail Screen (`order_detail_screen.dart`)
 - Complete order information
 - Customer contact (phone call)
-- Maps integration
-- Status update buttons
+- Maps integration (if needed)
+- Accept/Decline workflow for pending orders
+- Status update buttons (Preparing, Ready, Completed)
 - Special instructions display
 
-### 6. Profile Screen (`profile_screen.dart`)
-- User information display
+### 6. Products Screen (`products_screen.dart`)
+- Tabbed interface (Available, Out of Stock)
+- Product list with images
+- Add new product (FAB)
+- Edit/delete product options
+- Product details (name, price, stock, category)
+- Pull-to-refresh
+
+### 7. Profile Screen (`profile_screen.dart`)
+- Store/vendor information display
+- Store name, address, description
 - Profile settings
 - App information
 - Logout functionality
@@ -125,34 +137,73 @@ Splash Screen (Auto-navigate)
 - Order? selectedOrder
 - List<Order> pendingOrders
 - List<Order> activeOrders
+- List<Order> readyOrders
 - List<Order> completedOrders
 - fetchOrders()
 - updateOrderStatus(orderId, status)
+```
+
+### Product Provider (`product_provider.dart`)
+```dart
+- List<Product> products
+- Product? selectedProduct
+- List<Product> availableProducts
+- List<Product> outOfStockProducts
+- fetchProducts()
+- addProduct(productData)
+- updateProduct(productId, updates)
+- deleteProduct(productId)
 ```
 
 ## API Endpoints
 
 Base URL: `https://mygetwell.app/api`
 
+### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/delivery/login` | Authenticate delivery personnel |
-| POST | `/delivery/register` | Register new delivery personnel |
-| GET | `/delivery/orders` | Get assigned orders |
-| GET | `/delivery/orders/:id` | Get order details |
-| PUT | `/delivery/orders/:id/status` | Update order status |
-| PUT | `/delivery/profile` | Update profile |
+| POST | `/vendor/login` | Authenticate vendor |
+| POST | `/vendor/register` | Register new vendor |
+
+### Order Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/vendor/orders` | Get store orders |
+| GET | `/vendor/orders/:id` | Get order details |
+| PUT | `/vendor/orders/:id/status` | Update order status |
+
+### Product Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/vendor/products` | Get store products |
+| POST | `/vendor/products` | Add new product |
+| PUT | `/vendor/products/:id` | Update product |
+| DELETE | `/vendor/products/:id` | Delete product |
+
+### Profile Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/vendor/profile` | Update store profile |
 
 ## Order Status Flow
 
 ```
-pending → assigned → picked_up → in_transit → delivered
+pending → accepted → preparing → ready → completed
+        ↘ cancelled
 ```
 
 Each status has:
 - Unique color coding
 - Appropriate action buttons
 - Status badge display
+
+Vendor-specific statuses:
+- **pending**: New order awaiting vendor response
+- **accepted**: Vendor has accepted the order
+- **preparing**: Vendor is preparing the order
+- **ready**: Order is ready for pickup/delivery
+- **completed**: Order has been fulfilled
+- **cancelled**: Order was declined or cancelled
 
 ## Dependencies
 
@@ -170,13 +221,13 @@ Each status has:
 - `google_maps_flutter` - Maps integration
 - `geolocator` - Location services
 - `url_launcher` - Phone calls and maps
-- `image_picker` - Camera access (for future POD)
+- `image_picker` - Camera access (for product images)
 
 ## Design System
 
 ### Colors
-- Primary: `#2E7D32` (Healthcare Green)
-- Secondary: `#43A047`
+- Primary: `#1976D2` (Business Blue)
+- Secondary: `#42A5F5`
 - Accent: `#FF6F00`
 - Success: `#388E3C`
 - Error: `#D32F2F`
@@ -197,17 +248,20 @@ lib/
 ├── main.dart                     # App entry point, routing
 ├── models/                       # Data models
 │   ├── order.dart               # Order & OrderItem classes
-│   └── user.dart                # User class
+│   ├── user.dart                # User class
+│   └── product.dart             # Product class
 ├── providers/                    # State management
 │   ├── auth_provider.dart       # Authentication state
-│   └── order_provider.dart      # Order management state
+│   ├── order_provider.dart      # Order management state
+│   └── product_provider.dart    # Product management state
 ├── screens/                      # UI screens
 │   ├── splash_screen.dart       # Initial loading screen
 │   ├── login_screen.dart        # Authentication screen
-│   ├── home_screen.dart         # Dashboard
+│   ├── home_screen.dart         # Vendor dashboard
 │   ├── orders_screen.dart       # Order list with tabs
 │   ├── order_detail_screen.dart # Detailed order view
-│   └── profile_screen.dart      # User profile
+│   ├── products_screen.dart     # Product management
+│   └── profile_screen.dart      # Store profile
 ├── services/                     # Business logic
 │   ├── api_service.dart         # HTTP API calls
 │   └── storage_service.dart     # Local data persistence

@@ -5,11 +5,13 @@ class Order {
   final String deliveryAddress;
   final String orderDate;
   final double totalAmount;
-  final String status; // 'pending', 'assigned', 'picked_up', 'in_transit', 'delivered', 'cancelled'
+  final String status; // 'pending', 'accepted', 'preparing', 'ready', 'completed', 'cancelled'
   final List<OrderItem> items;
   final double? latitude;
   final double? longitude;
   final String? specialInstructions;
+  final String? paymentMethod;
+  final String? deliveryType; // 'pickup', 'delivery'
 
   Order({
     required this.id,
@@ -23,6 +25,8 @@ class Order {
     this.latitude,
     this.longitude,
     this.specialInstructions,
+    this.paymentMethod,
+    this.deliveryType,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class Order {
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
       specialInstructions: json['special_instructions'],
+      paymentMethod: json['payment_method'],
+      deliveryType: json['delivery_type'],
     );
   }
 
@@ -57,6 +63,8 @@ class Order {
       'latitude': latitude,
       'longitude': longitude,
       'special_instructions': specialInstructions,
+      'payment_method': paymentMethod,
+      'delivery_type': deliveryType,
     };
   }
 }
