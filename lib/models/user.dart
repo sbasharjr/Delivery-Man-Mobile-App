@@ -4,10 +4,11 @@ class User {
   final String email;
   final String phone;
   final String? profileImage;
-  final String role; // 'delivery_man'
+  final String role; // 'vendor'
   final bool isActive;
-  final String? vehicleType;
-  final String? vehicleNumber;
+  final String? storeName;
+  final String? storeAddress;
+  final String? storeDescription;
 
   User({
     required this.id,
@@ -17,8 +18,9 @@ class User {
     this.profileImage,
     required this.role,
     this.isActive = true,
-    this.vehicleType,
-    this.vehicleNumber,
+    this.storeName,
+    this.storeAddress,
+    this.storeDescription,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -28,10 +30,11 @@ class User {
       email: json['email'] ?? '',
       phone: json['phone'] ?? '',
       profileImage: json['profile_image'],
-      role: json['role'] ?? 'delivery_man',
+      role: json['role'] ?? 'vendor',
       isActive: json['is_active'] ?? true,
-      vehicleType: json['vehicle_type'],
-      vehicleNumber: json['vehicle_number'],
+      storeName: json['store_name'],
+      storeAddress: json['store_address'],
+      storeDescription: json['store_description'],
     );
   }
 
@@ -44,8 +47,9 @@ class User {
       'profile_image': profileImage,
       'role': role,
       'is_active': isActive,
-      'vehicle_type': vehicleType,
-      'vehicle_number': vehicleNumber,
+      'store_name': storeName,
+      'store_address': storeAddress,
+      'store_description': storeDescription,
     };
   }
 }

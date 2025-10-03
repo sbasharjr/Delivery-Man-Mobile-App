@@ -18,7 +18,7 @@ class ApiService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/delivery/login'),
+        Uri.parse('$baseUrl/vendor/login'),
         headers: await _getHeaders(),
         body: jsonEncode({
           'email': email,
@@ -45,7 +45,7 @@ class ApiService {
   Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/delivery/register'),
+        Uri.parse('$baseUrl/vendor/register'),
         headers: await _getHeaders(),
         body: jsonEncode(userData),
       );
@@ -69,7 +69,7 @@ class ApiService {
   Future<Map<String, dynamic>> getOrders() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/delivery/orders'),
+        Uri.parse('$baseUrl/vendor/orders'),
         headers: await _getHeaders(),
       );
 
@@ -92,7 +92,7 @@ class ApiService {
   Future<Map<String, dynamic>> getOrderById(String orderId) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/delivery/orders/$orderId'),
+        Uri.parse('$baseUrl/vendor/orders/$orderId'),
         headers: await _getHeaders(),
       );
 
@@ -116,7 +116,7 @@ class ApiService {
       String orderId, String status) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/delivery/orders/$orderId/status'),
+        Uri.parse('$baseUrl/vendor/orders/$orderId/status'),
         headers: await _getHeaders(),
         body: jsonEncode({'status': status}),
       );
@@ -141,7 +141,7 @@ class ApiService {
       Map<String, dynamic> updates) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/delivery/profile'),
+        Uri.parse('$baseUrl/vendor/profile'),
         headers: await _getHeaders(),
         body: jsonEncode(updates),
       );
@@ -152,6 +152,102 @@ class ApiService {
         return {
           'success': false,
           'message': 'Failed to update profile.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error. Please try again.',
+      };
+    }
+  }
+
+  // Product Management APIs
+  Future<Map<String, dynamic>> getProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/vendor/products'),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to fetch products.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error. Please try again.',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> addProduct(Map<String, dynamic> productData) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/vendor/products'),
+        headers: await _getHeaders(),
+        body: jsonEncode(productData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to add product.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error. Please try again.',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProduct(
+      String productId, Map<String, dynamic> updates) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/vendor/products/$productId'),
+        headers: await _getHeaders(),
+        body: jsonEncode(updates),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to update product.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error. Please try again.',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteProduct(String productId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/vendor/products/$productId'),
+        headers: await _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Failed to delete product.',
         };
       }
     } catch (e) {

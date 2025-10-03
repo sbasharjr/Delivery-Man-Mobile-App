@@ -17,7 +17,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadOrders();
   }
 
@@ -38,7 +38,7 @@ class _OrdersScreenState extends State<OrdersScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Orders'),
+        title: const Text('Orders'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -47,9 +47,11 @@ class _OrdersScreenState extends State<OrdersScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
           tabs: const [
             Tab(text: 'Pending'),
             Tab(text: 'Active'),
+            Tab(text: 'Ready'),
             Tab(text: 'Completed'),
           ],
         ),
@@ -61,6 +63,7 @@ class _OrdersScreenState extends State<OrdersScreen>
               children: [
                 _buildOrderList(orderProvider.pendingOrders),
                 _buildOrderList(orderProvider.activeOrders),
+                _buildOrderList(orderProvider.readyOrders),
                 _buildOrderList(orderProvider.completedOrders),
               ],
             ),

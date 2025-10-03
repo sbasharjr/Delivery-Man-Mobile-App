@@ -1,5 +1,5 @@
-name: delivery_man_app
-description: Delivery Man mobile app for mygetwell.app
+name: vendor_app
+description: Vendor mobile app for mygetwell.app
 publish_to: 'none'
 version: 1.0.0+1
 
