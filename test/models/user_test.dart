@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:delivery_man_app/models/user.dart';
+import 'package:vendor_app/models/user.dart';
 
 void main() {
   group('User Model Tests', () {
@@ -11,10 +11,11 @@ void main() {
         'email': 'jane@example.com',
         'phone': '+1234567890',
         'profile_image': 'https://example.com/profile.jpg',
-        'role': 'delivery_man',
+        'role': 'vendor',
         'is_active': true,
-        'vehicle_type': 'Motorcycle',
-        'vehicle_number': 'ABC-123',
+        'store_name': 'Jane\'s Store',
+        'store_address': '123 Main St, City',
+        'store_description': 'Best products in town',
       };
 
       // Act
@@ -26,10 +27,11 @@ void main() {
       expect(user.email, 'jane@example.com');
       expect(user.phone, '+1234567890');
       expect(user.profileImage, 'https://example.com/profile.jpg');
-      expect(user.role, 'delivery_man');
+      expect(user.role, 'vendor');
       expect(user.isActive, true);
-      expect(user.vehicleType, 'Motorcycle');
-      expect(user.vehicleNumber, 'ABC-123');
+      expect(user.storeName, 'Jane\'s Store');
+      expect(user.storeAddress, '123 Main St, City');
+      expect(user.storeDescription, 'Best products in town');
     });
 
     test('User.toJson should create a valid JSON map', () {
@@ -39,10 +41,11 @@ void main() {
         name: 'Jane Smith',
         email: 'jane@example.com',
         phone: '+1234567890',
-        role: 'delivery_man',
+        role: 'vendor',
         isActive: true,
-        vehicleType: 'Motorcycle',
-        vehicleNumber: 'ABC-123',
+        storeName: 'Jane\'s Store',
+        storeAddress: '123 Main St, City',
+        storeDescription: 'Best products in town',
       );
 
       // Act
@@ -53,7 +56,8 @@ void main() {
       expect(json['name'], 'Jane Smith');
       expect(json['email'], 'jane@example.com');
       expect(json['is_active'], true);
-      expect(json['vehicle_type'], 'Motorcycle');
+      expect(json['store_name'], 'Jane\'s Store');
+      expect(json['store_address'], '123 Main St, City');
     });
 
     test('User.fromJson should handle missing optional fields', () {
@@ -63,7 +67,7 @@ void main() {
         'name': 'Jane Smith',
         'email': 'jane@example.com',
         'phone': '+1234567890',
-        'role': 'delivery_man',
+        'role': 'vendor',
       };
 
       // Act
@@ -71,8 +75,9 @@ void main() {
 
       // Assert
       expect(user.profileImage, isNull);
-      expect(user.vehicleType, isNull);
-      expect(user.vehicleNumber, isNull);
+      expect(user.storeName, isNull);
+      expect(user.storeAddress, isNull);
+      expect(user.storeDescription, isNull);
       expect(user.isActive, true); // Default value
     });
   });
